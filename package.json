@@ -1,6 +1,6 @@
 {
   "name": "whynopadlock",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Checks for http connections on an https site",
   "main": "lib/index.js",
   "scripts": {
@@ -35,19 +35,19 @@
   "homepage": "https://github.com/richardstevens/whynopadlock",
   "dependencies": {
     "cheerio": "^0.19.0",
+    "colors": "^1.1.2",
     "nodemailer": "^1.4.0",
-    "publish": "^0.5.0",
     "request": "^2.60.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
     "chai": "^3.5.0",
     "chai-lint": "^0.1.1",
-    "colors": "^1.1.2",
     "eslint": "^1.10.3",
     "eslint-plugin-mocha": "^1.1.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5",
+    "publish": "^0.5.0",
     "sinon": "^1.17.3"
   }
 }
