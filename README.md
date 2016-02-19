@@ -2,9 +2,7 @@
 
 ### Setup
 ```
-git clone git@github.com:richardstevens/https_crawler.git
-cd https_crawler
-npm i
+npm i whynopadlock --save
 ```
 
 ### Project setup
@@ -12,11 +10,13 @@ You will need to create a new file for your project `example.js` and then from i
 
 *Usage*
 ```
-var pages = [
-	'https://www.example.com/'
-]
+import Crawler from 'crawler';
 
-var Crawler = require( './crawler.js' )( pages )
+var pages = [
+  'https://www.example.com/'
+];
+
+Crawler( pages );
 ```
 You can now run this in the console with `node example.js`
 
