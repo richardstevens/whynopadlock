@@ -1,4 +1,4 @@
-# HTTPS Crawler
+# HTTPS Crawler from WhyNoPadlock
 
 ### Setup
 ```
@@ -10,13 +10,13 @@ You will need to create a new file for your project `example.js` and then from i
 
 *Usage*
 ```
-import Crawler from 'crawler';
+import WhyNoPadlock from 'whynopadlock';
 
 var pages = [
   'https://www.example.com/'
 ];
 
-Crawler( pages );
+WhyNoPadlock( pages );
 ```
 You can now run this in the console with `node example.js`
 
