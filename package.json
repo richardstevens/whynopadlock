@@ -1,0 +1,52 @@
+{
+  "name": "whynopadlock",
+  "version": "0.0.1",
+  "description": "Checks for http connections on an https site",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "babel ./src -d ./lib",
+    "clean": "rm -rf ./lib",
+    "prepublish": "npm run build",
+    "coverage": "npm run build && istanbul cover _mocha -- --compilers js:babel/register tests/*.js && istanbul check-coverage --statements 99 --branches 93 --functions 100 --lines 99",
+    "test": "npm run build && mocha --compilers js:babel/register tests",
+    "ci": "npm run coverage && npm run lint",
+    "lint": "eslint tests src && echo '🍻  All Good!'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/richardstevens/whynopadlock"
+  },
+  "keywords": [
+    "https",
+    "whynopadlock",
+    "secure",
+    "checker",
+    "check",
+    "insecure",
+    "security",
+    "http",
+    "ssl"
+  ],
+  "author": "Richard Stevens <rsrichardstevens@googlemail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/richardstevens/whynopadlock/issues"
+  },
+  "homepage": "https://github.com/richardstevens/whynopadlock",
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "nodemailer": "^1.4.0",
+    "request": "^2.60.0"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "chai": "^3.5.0",
+    "chai-lint": "^0.1.1",
+    "colors": "^1.1.2",
+    "eslint": "^1.10.3",
+    "eslint-plugin-mocha": "^1.1.0",
+    "istanbul": "^0.4.2",
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.3"
+  }
+}
