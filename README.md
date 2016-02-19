@@ -1,3 +1,5 @@
+[![Circle CI](https://circleci.com/gh/richardstevens/whynopadlock/tree/master.svg?style=shield)](https://circleci.com/gh/richardstevens/whynopadlock/tree/master)
+
 # HTTPS Crawler from WhyNoPadlock
 
 ### Setup
