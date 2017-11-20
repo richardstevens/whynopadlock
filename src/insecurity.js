@@ -3,8 +3,10 @@ import cheerio from 'cheerio'
 import request from 'request'
 import Helpers from './helpers'
 
+const foundErrors = []
+
 const Crawler = (opts) => {
-  let { pages, cb = () => {}, whitelist = [], timeout = 3000 } = opts
+  let { pages, cb = () => {}, whitelist = [], timeout = 2000 } = opts
   if (!pages) return
   pages = Array.isArray(pages) ? pages : [ pages ]
   if (!pages.length) return cb(new Error('No pages provided'))
@@ -17,7 +19,7 @@ const Crawler = (opts) => {
         CallBack(err, res, body, page, cb, whitelist)
       })
     }, i)
-    i += timeout // Lets wait 3 seconds per request - yes i did accidentally DDos them
+    i += timeout // Lets wait a few seconds per request - yes i did accidentally DDos them
   })
 }
 
@@ -26,77 +28,99 @@ const CallBack = (err, res, body, page, cb, whitelist) => {
     cb(new Error('Error: ' + err))
     return console.log('Error:', err)
   }
-  Helpers.showStat(page)
-  let error = false
-  const html = ''
-  const text = ''
+  const fileErrors = []
   const htmlProblems = insecurity.html(body, {passive: true, scripts: true, styles: true, whitelist})
 
   const $ = cheerio.load(body)
   const stylesheets = $('link[rel=stylesheet]')
   const scripts = $('script[src]')
   htmlProblems.map(htmlError => {
-    Helpers.showError(htmlError.url + ' - Found in ' + htmlError.tag)
-    error = 1
+    return fileErrors.push(new Promise(resolve => {
+      resolve({ error: htmlError.url + ' - Found in ' + htmlError.tag })
+    }))
   })
   stylesheets.each((index, stylesheet) => {
-    if (!stylesheet || !$(stylesheet).attr('href')) return
-    const url = Helpers.makeUrl($(stylesheet).attr('href'), page)
+    return fileErrors.push(new Promise(resolve => {
+      if (!stylesheet || !$(stylesheet).attr('href')) return resolve()
+      const url = Helpers.makeUrl($(stylesheet).attr('href'), page)
+      if (foundErrors[url]) return resolve(foundErrors[url])
 
-    request.get({
-      url
-    }, (err, res, body) => {
-      if (err) return Helpers.showLog('Error processing: ' + url)
-      try {
-        const cssProblems = insecurity.css(body, {quiet: true, whitelist})
-        if (!cssProblems.length) return
-        Helpers.showError(url)
-        cssProblems.map(cssError => {
-          Helpers.showError(cssError.url + ' - ' + cssError.property + ', line: ' + cssError.line, '\t\t')
-        })
-        error = 1
-      } catch (e) {
-        Helpers.showLog('Error processing: ' + url)
-      }
-    })
+      request.get({
+        url
+      }, (err, res, body) => {
+        if (err) {
+          foundErrors[url] = { log: 'Error processing: ' + url }
+          return resolve({ log: 'Error processing: ' + url })
+        }
+        try {
+          const cssProblems = insecurity.css(body, {quiet: true, whitelist})
+          if (!cssProblems.length) return resolve()
+          const errors = []
+          cssProblems.map(cssError => {
+            errors.push(cssError.url + ' - ' + cssError.property + ', line: ' + cssError.line)
+          })
+          foundErrors[url] = { url, errors }
+          resolve({ url, errors })
+        } catch (e) {
+          foundErrors[url] = { log: 'Error processing: ' + url }
+          resolve({ log: 'Error processing: ' + url })
+        }
+      })
+    }))
   })
   scripts.each((index, script) => {
-    if (!script || !$(script).attr('src')) return
-    const url = Helpers.makeUrl($(script).attr('src'), page)
+    return fileErrors.push(new Promise(resolve => {
+      if (!script || !$(script).attr('src')) return resolve()
+      const url = Helpers.makeUrl($(script).attr('src'), page)
+      if (foundErrors[url]) return resolve(foundErrors[url])
 
-    request.get({
-      url
-    }, (err, res, body) => {
-      if (err) return Helpers.showLog('Error processing: ' + url)
-      try {
-        const jsProblems = insecurity.js(body, {quiet: true, whitelist})
-        if (!jsProblems.length) return
-        Helpers.showError(url)
-        jsProblems.map(jsError => {
-          Helpers.showError(jsError.url + ' - line: ' + jsError.line, '\t\t')
-        })
-        error = 1
-      } catch (e) {
-        Helpers.showLog('Error processing: ' + url)
-      }
-    })
+      request.get({
+        url
+      }, (err, res, body) => {
+        if (err) {
+          foundErrors[url] = { log: 'Error processing: ' + url }
+          return resolve({ log: 'Error processing: ' + url })
+        }
+        try {
+          const jsProblems = insecurity.js(body, {quiet: true, whitelist})
+          if (!jsProblems.length) return resolve()
+          const errors = []
+          jsProblems.map(jsError => {
+            errors.push(jsError.url + ' - line: ' + jsError.line)
+          })
+          foundErrors[url] = { url, errors }
+          resolve({ url, errors })
+        } catch (e) {
+          foundErrors[url] = { log: 'Error processing: ' + url }
+          resolve({ log: 'Error processing: ' + url })
+        }
+      })
+    }))
   })
 
-  if (!error) {
-    cb(null, 'success')
-    return Helpers.showSuccess('Everything is good!')
-  }
-  console.log('') // Display blank line
-
-  var mailOptions = {
-    from: '',
-    to: '',
-    subject: 'HTTPS Warnings  - ' + page,
-    text: text,
-    html: html
-  }
-  Helpers.sendMail(mailOptions)
-  return cb(null, 'success')
+  Promise.all(fileErrors).then(errors => {
+    let error = 0
+    Helpers.showStat(page)
+    errors.map(errorFound => {
+      if (!errorFound) return
+      if (errorFound.log) return Helpers.showLog(errorFound.log)
+      error++
+      if (errorFound.error) return Helpers.showError(errorFound.error)
+      if (errorFound.url) {
+        Helpers.showError(errorFound.url)
+        error--
+        errorFound.errors.map(errorLink => {
+          error++
+          Helpers.showError(errorLink, '\t\t')
+        })
+      }
+    })
+    if (!error) {
+      cb(null, 'success')
+      return Helpers.showSuccess('Everything is good!\n')
+    }
+    Helpers.showLog('Found ' + error + ' errors!\n')
+  })
 }
 
 export default Crawler
