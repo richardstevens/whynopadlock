@@ -11,15 +11,33 @@ npm i whynopadlock --save
 You will need to create a new file for your project `example.js` and then from in there you will need to add a basic setup structure to take in pages to test as an array, look at the Usage instructions below.
 
 *Usage*
+*whynopadlock*
 ```
-import WhyNoPadlock from 'whynopadlock';
+import { whynopadlock } from 'whynopadlock';
 
 var pages = [
   'https://www.example.com/'
 ];
 
-WhyNoPadlock( pages );
+whynopadlock( pages );
 ```
-You can now run this in the console with `node example.js`
+
+*insecurity*
+import { insecurity } from 'whynopadlock';
+
+var pages = [
+  'https://www.example.com/'
+];
+
+insecurity({
+  pages,
+  cb: () => {},
+  whitelist: [
+    /w3\.com/
+  ]
+});
+```
+
+You can now run either of these in the console with `node example.js`
 
 Thanks
