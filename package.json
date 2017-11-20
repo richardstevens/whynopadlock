@@ -1,6 +1,6 @@
 {
   "name": "whynopadlock",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "Checks for http connections on an https site",
   "main": "lib/index.js",
   "scripts": {
@@ -10,7 +10,27 @@
     "coverage": "npm run build && istanbul cover _mocha -- --compilers js:babel/register tests/*.js && istanbul check-coverage --statements 99 --branches 93 --functions 100 --lines 99",
     "test": "npm run build && mocha --compilers js:babel/register tests",
     "ci": "npm run lint",
-    "lint": "eslint tests src && echo '🍻  All Good!'"
+    "lint": "standard 'tests/**/*' 'src/**/*' --verbose | snazzy && echo 🍻 All good!"
+  },
+  "standard": {
+    "globals": [
+      "$",
+      "after",
+      "afterEach",
+      "before",
+      "beforeEach",
+      "context",
+      "describe",
+      "expect",
+      "it",
+      "sandbox",
+      "sinon",
+      "Image"
+    ]
+  },
+  "engines": {
+    "node": "6.1.0",
+    "npm": "3.9.4"
   },
   "repository": {
     "type": "git",
@@ -37,17 +57,18 @@
     "cheerio": "^0.19.0",
     "colors": "^1.1.2",
     "nodemailer": "^1.4.0",
-    "request": "^2.60.0"
+    "request": "^2.60.0",
+    "url-parse": "^1.2.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
     "chai": "^3.5.0",
     "chai-lint": "^0.1.1",
-    "eslint": "^1.10.3",
-    "eslint-plugin-mocha": "^1.1.0",
     "istanbul": "^0.4.2",
     "mocha": "^2.4.5",
     "publish": "^0.5.0",
-    "sinon": "^1.17.3"
+    "sinon": "^1.17.3",
+    "snazzy": "^7.0.0",
+    "standard": "^10.0.2"
   }
 }
