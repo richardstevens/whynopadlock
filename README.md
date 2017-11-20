@@ -34,7 +34,8 @@ insecurity({
   cb: () => {},
   whitelist: [
     /w3\.com/
-  ]
+  ],
+  timeout: 2000
 });
 ```
 

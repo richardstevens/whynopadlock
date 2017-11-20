@@ -1,6 +1,6 @@
 {
   "name": "whynopadlock",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Checks for http connections on an https site",
   "main": "lib/index.js",
   "scripts": {
@@ -56,6 +56,7 @@
   "dependencies": {
     "cheerio": "^0.19.0",
     "colors": "^1.1.2",
+    "insecurity": "^3.1.0",
     "nodemailer": "^1.4.0",
     "request": "^2.60.0",
     "url-parse": "^1.2.0"

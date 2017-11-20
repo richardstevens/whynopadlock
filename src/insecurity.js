@@ -4,7 +4,7 @@ import request from 'request'
 import Helpers from './helpers'
 
 const Crawler = (opts) => {
-  let { pages, cb = () => {}, whitelist = [] } = opts
+  let { pages, cb = () => {}, whitelist = [], timeout = 3000 } = opts
   if (!pages) return
   pages = Array.isArray(pages) ? pages : [ pages ]
   if (!pages.length) return cb(new Error('No pages provided'))
@@ -17,7 +17,7 @@ const Crawler = (opts) => {
         CallBack(err, res, body, page, cb, whitelist)
       })
     }, i)
-    i += 3000 // Lets wait 3 seconds per request - yes i did accidentally DDos them
+    i += timeout // Lets wait 3 seconds per request - yes i did accidentally DDos them
   })
 }
 
