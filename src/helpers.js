@@ -29,7 +29,7 @@ const Helpers = {
   makeUrl: (href, page) => {
     if (href.slice(0, 2) === '//') href = 'https:' + href
     const { hostname } = urlParse(page, true)
-    if (href.slice(0, 1) === '/') href = 'https://' + hostname + '/' + href
+    if (href.slice(0, 1) === '/') href = 'https://' + hostname + href
     return href
   },
 
