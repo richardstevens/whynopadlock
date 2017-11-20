@@ -23,6 +23,7 @@ whynopadlock( pages );
 ```
 
 *insecurity*
+```
 import { insecurity } from 'whynopadlock';
 
 var pages = [
