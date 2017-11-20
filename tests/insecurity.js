@@ -1,7 +1,6 @@
 import chai from 'chai'
 import chaiLint from 'chai-lint'
 import crawler from '../lib/insecurity'
-import sinon from 'sinon'
 chai.use(chaiLint)
 const { expect } = chai
 
