@@ -119,6 +119,7 @@ const CallBack = (err, res, body, page, cb, whitelist) => {
       cb(null, 'success')
       return Helpers.showSuccess('Everything is good!\n')
     }
+    cb(new Error('Found ' + error + ' errors!'))
     Helpers.showLog('Found ' + error + ' errors!\n')
   })
 }
