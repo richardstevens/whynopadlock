@@ -6,7 +6,7 @@ import Helpers from './helpers'
 const foundErrors = []
 
 const Crawler = (opts) => {
-  let { pages, cb = () => {}, whitelist = [], timeout = 2000 } = opts
+  let { pages, cb = () => {}, timeout = 2000 } = opts
   if (!pages) return
   pages = Array.isArray(pages) ? pages : [ pages ]
   if (!pages.length) return cb(new Error('No pages provided'))
@@ -16,14 +16,15 @@ const Crawler = (opts) => {
       request.post({
         url: page
       }, (err, res, body) => {
-        CallBack(err, res, body, page, cb, whitelist)
+        CallBack(err, res, body, page, opts)
       })
     }, i)
     i += timeout // Lets wait a few seconds per request - yes i did accidentally DDos them
   })
 }
 
-const CallBack = (err, res, body, page, cb, whitelist) => {
+const CallBack = (err, res, body, page, opts) => {
+  let { cb = () => {}, whitelist = [], showErrorsOnly = false } = opts
   if (err) {
     cb(new Error('Error: ' + err))
     return console.log('Error:', err)
@@ -103,7 +104,10 @@ const CallBack = (err, res, body, page, cb, whitelist) => {
     Helpers.showStat(page)
     errors.map(errorFound => {
       if (!errorFound) return
-      if (errorFound.log) return Helpers.showLog(errorFound.log)
+      if (errorFound.log) {
+        if (!showErrorsOnly) Helpers.showLog(errorFound.log)
+        return
+      }
       error++
       if (errorFound.error) return Helpers.showError(errorFound.error)
       if (errorFound.url) {
@@ -117,7 +121,8 @@ const CallBack = (err, res, body, page, cb, whitelist) => {
     })
     if (!error) {
       cb(null, 'success')
-      return Helpers.showSuccess('Everything is good!\n')
+      if (!showErrorsOnly) Helpers.showSuccess('Everything is good!\n')
+      return
     }
     cb(new Error('Found ' + error + ' errors!'))
     Helpers.showLog('Found ' + error + ' errors!\n')
