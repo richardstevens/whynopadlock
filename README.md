@@ -36,9 +36,13 @@ insecurity({
   whitelist: [
     /w3\.com/
   ],
-  timeout: 2000
+  timeout: 2000,
+  showErrorsOnly: false,
+  showRobotsErrors: true
 });
 ```
+__showRobotsErrors__ - This will display an error when a robots or googleBot meta tag is displayed  
+__showErrorsOnly__ - This will just display when an error is found (No green ok message)
 
 You can now run either of these in the console with `node example.js`
 

@@ -24,7 +24,7 @@ const Crawler = (opts) => {
 }
 
 const CallBack = (err, res, body, page, opts) => {
-  let { cb = () => {}, whitelist = [], showErrorsOnly = false } = opts
+  let { cb = () => {}, whitelist = [], showErrorsOnly = false, showRobotsErrors = false } = opts
   if (err) {
     cb(new Error('Error: ' + err))
     return console.log('Error:', err)
@@ -33,6 +33,16 @@ const CallBack = (err, res, body, page, opts) => {
   const htmlProblems = insecurity.html(body, {passive: true, scripts: true, styles: true, whitelist})
 
   const $ = cheerio.load(body)
+  if (showRobotsErrors) {
+    const robots = $('meta[name=robots]')
+    const googleBot = $('meta[name=googlebot]')
+    if ($(robots).attr('content') && $(robots).attr('content').indexOf('noindex') > -1) {
+      htmlProblems.push({url: 'robots tag found with noindex', tag: 'meta'})
+    }
+    if ($(googleBot).attr('content') && $(googleBot).attr('content').indexOf('noindex') > -1) {
+      htmlProblems.push({url: 'googlebot tag found with noindex', tag: 'meta'})
+    }
+  }
   const stylesheets = $('link[rel=stylesheet]')
   const scripts = $('script[src]')
   htmlProblems.map(htmlError => {
@@ -73,6 +83,7 @@ const CallBack = (err, res, body, page, opts) => {
     return fileErrors.push(new Promise(resolve => {
       if (!script || !$(script).attr('src')) return resolve()
       const url = Helpers.makeUrl($(script).attr('src'), page)
+      if (url.indexOf('.addthis.com') > -1) return resolve()
       if (foundErrors[url]) return resolve(foundErrors[url])
 
       request.get({
